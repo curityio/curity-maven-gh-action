@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const os = require('os');
 
 /**
  * Checks if Maven is available in the environment
@@ -133,7 +134,7 @@ async function run() {
     const clientSecret = core.getInput('client-secret', { required: true });
     const scope = '';
     const serverId = 'curity-repo';
-    const settingsPath = path.join(process.env.RUNNER_TEMP || '/.m2', 'settings.xml');
+    const settingsPath = path.join(os.homedir(), '.m2', 'settings.xml');
     
     // Validate inputs
     if (!clientSecret.trim()) {
