@@ -39,7 +39,7 @@ jobs:
           
       # Setup Maven with OAuth token
       - name: Setup Maven with OAuth
-        uses: your-org/maven-oauth-action@v1
+        uses: curityio/curity-maven-gh-action@v1
         with:
           client-secret: ${{ secrets.CURITY_CLI_CLIENT_SECRET }}
           
