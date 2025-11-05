@@ -16,7 +16,7 @@ A GitHub Action that uses OAuth client credentials flow to obtain an access toke
 
 ## Usage
 
-### Basic Example
+### Example
 
 ```yaml
 name: Build with Maven OAuth
@@ -41,48 +41,18 @@ jobs:
       - name: Setup Maven with OAuth
         uses: your-org/maven-oauth-action@v1
         with:
-          oauth-server-url: 'https://oauth.example.com/oauth/token'
-          client-id: ${{ secrets.OAUTH_CLIENT_ID }}
-          client-secret: ${{ secrets.OAUTH_CLIENT_SECRET }}
-          scope: 'maven:read maven:write'
-          maven-server-id: 'my-maven-repo'
+          client-secret: ${{ secrets.CURITY_CLI_CLIENT_SECRET }}
           
       # Use Maven with the configured settings
       - name: Build with Maven
-        run: mvn clean compile -s ${{ steps.setup-maven.outputs.settings-file }}
-```
-
-### Advanced Example with Custom Settings Path
-
-```yaml
-      - name: Setup Maven with OAuth
-        id: maven-setup
-        uses: your-org/maven-oauth-action@v1
-        with:
-          oauth-server-url: ${{ vars.OAUTH_SERVER_URL }}
-          client-id: ${{ secrets.OAUTH_CLIENT_ID }}
-          client-secret: ${{ secrets.OAUTH_CLIENT_SECRET }}
-          scope: 'repo:read'
-          maven-server-id: 'private-repo'
-          maven-settings-path: './custom-settings.xml'
-          
-      - name: Deploy to repository
-        run: |
-          mvn deploy \
-            -s ${{ steps.maven-setup.outputs.settings-file }} \
-            -DaltDeploymentRepository=private-repo::default::https://maven.example.com/repository/
+        run: mvn package -s ${{ steps.setup-maven.outputs.settings-file }}
 ```
 
 ## Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `oauth-server-url` | OAuth server token endpoint URL | ✅ Yes | |
-| `client-id` | OAuth client ID | ✅ Yes | |
 | `client-secret` | OAuth client secret | ✅ Yes | |
-| `scope` | OAuth scope to request | ❌ No | `''` |
-| `maven-server-id` | Server ID to use in Maven settings.xml | ❌ No | `'default'` |
-| `maven-settings-path` | Path where to create the Maven settings.xml file | ❌ No | `'${{ runner.temp }}/settings.xml'` |
 
 ## Outputs
 
@@ -97,8 +67,7 @@ This action requires the following secrets to be configured in your repository:
 
 ### Required Secrets
 
-- `OAUTH_CLIENT_ID`: Your OAuth client ID
-- `OAUTH_CLIENT_SECRET`: Your OAuth client secret
+- `CURITY_CLI_CLIENT_SECRET`: Your OAuth client secret
 
 ### Setting up Secrets
 
@@ -106,12 +75,6 @@ This action requires the following secrets to be configured in your repository:
 2. Navigate to **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Add each required secret with the appropriate values
-
-### Environment Variables (Optional)
-
-You can also use repository variables for non-sensitive configuration:
-
-- `OAUTH_SERVER_URL`: Your OAuth server endpoint (if it doesn't change)
 
 ## Security Considerations
 
@@ -147,23 +110,10 @@ Your OAuth server must support the **client credentials flow** (RFC 6749 Section
 
 ## Generated Maven Settings
 
-The action creates a `settings.xml` file with the following structure:
+The action creates a `settings.xml` file that will mirror ALL repositories that may have
+been configured in the pom.xml file, including Maven Central, to the Curity Repository.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 
-                              http://maven.apache.org/xsd/settings-1.2.0.xsd">
-  <servers>
-    <server>
-      <id>your-server-id</id>
-      <username>oauth</username>
-      <password>your-access-token</password>
-    </server>
-  </servers>
-</settings>
-```
+This enforces the use of the Curity Repository for all dependencies.
 
 ## Error Handling
 
@@ -196,32 +146,6 @@ npm test
 npm run lint
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Run `npm run build` to update the `dist/` folder
-6. Submit a pull request
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-If you encounter any issues or have questions:
-
-1. Check the [GitHub Issues](https://github.com/your-org/maven-oauth-action/issues) for existing problems
-2. Create a new issue with detailed information about your problem
-3. Include your workflow YAML and any relevant error messages (redact sensitive information)
-
-## Changelog
-
-### v1.0.0
-- Initial release
-- OAuth client credentials flow support
-- Maven settings.xml generation
-- Automatic cleanup functionality
-- Maven environment validation
