@@ -34,18 +34,18 @@ jobs:
       - name: Set up JDK and Maven
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           
       # Setup Maven with OAuth token
       - name: Setup Maven with OAuth
+        id: setup-maven-oauth
         uses: curityio/curity-maven-gh-action@v1
         with:
           client-secret: ${{ secrets.CURITY_CLI_CLIENT_SECRET }}
           
-      # Use Maven with the configured settings
-      - name: Build with Maven
-        run: mvn package -s ${{ steps.setup-maven.outputs.settings-file }}
+      - name: Publish package
+        run: mvn deploy ${{ steps.setup-maven-oauth.outputs.maven-deploy-args }}
 ```
 
 ## Inputs
@@ -60,6 +60,7 @@ jobs:
 |--------|-------------|
 | `settings-file` | Path to the created Maven settings.xml file |
 | `access-token` | The obtained access token (masked in logs) |
+| `maven-deploy-args` | The Maven arguments for deploying to the repository |
 
 ## Secrets Setup
 
