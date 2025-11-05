@@ -114,7 +114,7 @@ function createMavenSettings(accessToken, serverId, uploadServerId, settingsPath
         <mirror>
         <id>${serverId}</id>
         <name>Curity Maven Repository</name>
-        <url>https://hub.curityio.net/repository/curity-release-repo/</url>
+        <url>https://hub.curityio.net/repository/curity-dev-repo-group/</url>
         <mirrorOf>*</mirrorOf>
         </mirror>
     </mirrors>
